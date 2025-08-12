@@ -1,0 +1,15 @@
+services:
+  - type: worker
+    name: guildbot-minimal
+    env: docker
+    autoDeploy: true
+    plan: free
+    # Set STRATZ_TOKEN in Render → Dashboard → Environment → Add Environment Variable
+    envVars:
+      - key: STRATZ_TOKEN
+        sync: false
+    # Optional: run on a schedule instead of always-on.
+    # For a cron job instead, change type to "cron" and add schedule.
+    # Example:
+    # type: cron
+    # schedule: "*/15 * * * *"  # every 15 minutes
