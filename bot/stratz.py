@@ -1,13 +1,20 @@
 import logging
+import os
 import requests
 from bot.throttle import throttle
 
 STRATZ_URL = "https://api.stratz.com/graphql"
 
-def _post(query: str, variables: dict, token: str, timeout: int = 15):
+def _post(query: str, variables: dict, token: str = None, timeout: int = 15):
+    """
+    Internal helper to send a POST request to the Stratz API.
+    Falls back to reading STRATZ_TOKEN from the environment if no token is passed.
+    """
+    if not token:
+        token = os.getenv("STRATZ_TOKEN", "").strip()
+
     headers = {
-        # keep this boring to avoid WAF heuristics
-        "User-Agent": "Mozilla/5.0 (compatible; GuildBot-Min/0.1)",
+        "User-Agent": "STRATZ_API",  # per your request
         "Authorization": f"Bearer {token}",
         "Content-Type": "application/json",
         "Accept": "application/json",
@@ -37,7 +44,7 @@ def _post(query: str, variables: dict, token: str, timeout: int = 15):
         return None
     return payload.get("data")
 
-def fetch_latest_match_id(steam32_id: int, token: str):
+def fetch_latest_match_id(steam32_id: int, token: str = None):
     """
     Returns latest match id, or 'quota_exceeded', or None on failure.
     """
@@ -55,7 +62,7 @@ def fetch_latest_match_id(steam32_id: int, token: str):
         return None
     return data["player"]["matches"][0]["id"]
 
-def fetch_full_match(match_id: int, token: str):
+def fetch_full_match(match_id: int, token: str = None):
     """
     Returns full match dict (subset of fields), 'quota_exceeded', or None.
     """
